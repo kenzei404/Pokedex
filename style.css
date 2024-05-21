@@ -1,0 +1,148 @@
+body {
+    background-color: rgba(54, 131, 60, 255) !important;
+    margin: 0;
+}
+
+h1 {
+    font-family: "Righteous", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: yellow;
+    font-size: 220px !important;
+    margin: 0;
+    margin-top: 200px !important;
+}
+
+.inputField {
+    height: 35px;
+    width: 200px;
+    border-radius: 5px;
+    font-size: 24px;
+    border: 2px solid black;
+}
+
+.searchButton {
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    background-color: yellow;
+    font-size: 24px;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+.pokemonSearch {
+    margin-top: 300px;
+}
+
+.header {
+    height: 700px;
+    background-image: url('image/myLandscape.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.pokemon-card {
+    border: 2px solid black;
+    width: 300px;
+    height: 400px;
+    border-radius: 40px;
+    margin: 40px;
+    box-shadow: 10px 10px 20px rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    transition: background-color 0.2s, transform 0.3s;
+}
+
+.pokemon-card:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pokemonImage {
+    height: 200px;
+    width: 200px;
+}
+
+.name {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.type-icon {
+    height: 64px;
+    margin-right: 4px;
+    margin: 24px;
+}
+
+.typeContainer {
+    display: flex;
+    justify-content: space-around;
+}
+
+.siteChanger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.previousPageButton,
+.nextPageButton {
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s;
+}
+
+.previousPageButton::before,
+.nextPageButton::before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 15px;
+    border-color: transparent;
+}
+
+.previousPageButton::before {
+    border-right-color: #ffffff;
+}
+
+.nextPageButton::before {
+    border-left-color: #ffffff;
+}
+
+.previousPageButton:hover,
+.nextPageButton:hover {
+    transform: scale(1.2);
+}
+
+.actualPage {
+    font-size: 40px;
+    color: #fff;
+    font-family: "Righteous", sans-serif;
+}
+
+.d-none {
+    display: none;
+}
