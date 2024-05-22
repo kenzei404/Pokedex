@@ -7,10 +7,8 @@ h1 {
     font-family: "Righteous", sans-serif;
     font-weight: 400;
     font-style: normal;
-    color: yellow;
-    font-size: 220px !important;
-    margin: 0;
-    margin-top: 200px !important;
+    color: #ffffff;
+    font-size: 64px;
 }
 
 .inputField {
@@ -25,7 +23,7 @@ h1 {
     height: 40px;
     width: 100px;
     border-radius: 5px;
-    background-color: yellow;
+    background-color: #ffe032;
     font-size: 24px;
     border: 2px solid black;
     cursor: pointer;
@@ -76,6 +74,7 @@ h1 {
 .pokemonImage {
     height: 200px;
     width: 200px;
+    margin: 20px;
 }
 
 .name {
@@ -146,3 +145,104 @@ h1 {
 .d-none {
     display: none;
 }
+
+.openedCard {
+    font-family: "Righteous", sans-serif;    
+    position: fixed;         /* Fixed Positionierung relativ zum Viewport */
+    top: 50%;                /* Setzt den oberen Rand des Elements in die Mitte des Viewports */
+    left: 50%;               /* Setzt den linken Rand des Elements in die Mitte des Viewports */
+    transform: translate(-50%, -50%); /* Verschiebt das Element zurück um seine eigene halbe Breite und Höhe */
+    width: 50%;              /* Breite des Elements */
+    height: 70%;             /* Höhe des Elements */
+    border: 2px solid black; /* Rahmen des Elements */
+    border-radius: 40px;     /* Abgerundete Ecken */
+    box-shadow: 10px 10px 20px rgb(0, 0, 0); /* Schatten für bessere Sichtbarkeit */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;  /* Hintergrundfarbe */
+    color: #000;             /* Textfarbe */
+    padding: 20px;           /* Innenabstand */
+    box-sizing: border-box;  /* Box-Sizing, damit Padding und Border in die Breite und Höhe einbezogen werden */
+}
+
+.openedPokemonImage {
+    height: 200px;
+    margin-right: 8%;
+    margin-left: 4%;
+}
+
+.openedCardHeader{
+    width: 100%;
+    display: flex;
+}
+
+.openedCardBody{
+    height: 100%;
+    width: 100%;
+}
+
+.typeName{
+    font-family: "Righteous", sans-serif;   
+    font-size: 40px;
+    color: #ffffff;
+}
+
+.openedTypeContainer{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 16px;
+}
+
+.description {
+    margin: 20px;
+    color: white;
+}
+
+.dot-navigation {
+    margin: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.dot {
+    height: 20px;
+    width: 20px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dot:hover {
+    background-color: #888;
+}
+
+.dot.active {
+    background-color: #333;
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.bar {
+    width: 100%;
+    margin: 2px 0;
+    text-align: center;
+    color: white;
+}
+
+
+.bar:hover {
+    opacity: 0.8; /* Slight transparency on hover */
+}
+
