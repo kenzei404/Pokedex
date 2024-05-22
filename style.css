@@ -232,14 +232,20 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: 100%; /* Adjust the width as necessary */
 }
 
 .bar {
-    width: 100%;
-    margin: 2px 0;
-    text-align: center;
-    color: white;
+    height: 40px; /* Height of each bar */
+    background-color: #00f9e4; /* Color of the bars */
+    margin: 5px 0; /* Space between bars */
+    color: white; /* Text color inside the bars */
+    text-align: right; /* Positioning the text to the right inside the bar */
+    padding-right: 5px; /* Padding for the text inside the bar */
+    box-sizing: border-box; /* Includes padding in the width calculation */
+    border-radius: 3px; /* Optional: rounded corners for the bars */
 }
+
 
 
 .bar:hover {

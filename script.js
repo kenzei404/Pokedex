@@ -92,71 +92,106 @@ function createPokemonCardHTML(pokemonName, pokemonData) {
 }
 
 
-async function openPokemonCardHTML(pokemonName) {
-
-    const url = `${BASE_URL}/${pokemonName.toLowerCase()}`; // Beispiel-URL, anpassen nach Notwendigkeit
-    const pokemonData = await fetchDetailedPokemonData(url);
-    const { sprites, types, weight, height, description } = pokemonData;
-   // switchPage2(pokemonData.stats);
-
-    const spriteUrl = pokemonData.sprites.other.dream_world.front_default || pokemonData.sprites.front_default;
-    const backgroundColor = getPokemonTypeColor(types);
-
-    const typeImages = types.map(typeInfo => {
-        const typeName = typeInfo.type.name;
-        const imgSrc = `image/${typeName}.png`;
+function getPokemonTypeImages(types) {
+    return types.map(typeInfo => {
+        const imgSrc = `image/${typeInfo.type.name}.png`;
         return `
-        <div class="openedTypeContainer">
-            <img src="${imgSrc}" class="type-icon"> 
-            <div class="typeName">${typeName}</div>
-        </div>`;
-    }).join(' ');
+            <div class="openedTypeContainer">
+                <img src="${imgSrc}" class="type-icon">
+                <div class="typeName">${typeInfo.type.name}</div>
+            </div>`;
+    }).join('');
+}
 
+function createDotNavigation(weight, height, stats) {
+    const statsJson = JSON.stringify(stats); // Konvertiere die Stats in einen JSON-String für die sichere Übergabe
+    return `
+        <div class="dot-navigation">
+            <button class="dot" onclick="switchPage1(${weight}, ${height})"></button>
+            <button class="dot" onclick="switchPage2(this.getAttribute('data-stats'))" data-stats='${statsJson}'></button>
+            <button class="dot" onclick="switchPage3()"></button>
+        </div>`;
+}
+
+
+function createStatsContainer(weight, height) {
+    return `
+        <div id="statContainer" class="stats">
+            <b>Weight:</b> ${weight} kg <br>  
+            <b>Height:</b> ${height} dm
+        </div>`;
+}
+
+function createOpenedCardBody(description, typeImages, weight, height, stats) {
     const formattedDescription = cleanText(description).replace(/\n/g, '<br>');
+    return `
+        <div class="openedCardBody" id="openedCardBody">
+            <div class="description">${formattedDescription}</div>
+            <div class="typeContainer">${typeImages}</div>
+            ${createDotNavigation(weight, height, stats)}
+            ${createStatsContainer(weight, height)}
+        </div>`;
+}
+
+function createOpenedCardHeader(name, imageUrl) {
+    return `
+        <div class="openedCardHeader">
+            <img src="${imageUrl}" class="openedPokemonImage" alt="${name}">
+            <h1>${name}</h1>
+        </div>`;
+}
+
+async function openPokemonCardHTML(pokemonName) {
+    const url = `${BASE_URL}/${pokemonName.toLowerCase()}`;
+    const pokemonData = await fetchDetailedPokemonData(url);
+    const { sprites, types, weight, height, description, stats } = pokemonData;
+    const formattedStats = formatStats(stats); // Option 1, wenn du mit den Daten arbeiten möchtest
+    // const statsJson = statsToJson(stats); // Option 2, wenn du die Daten als JSON-String brauchst
+
+    const backgroundColor = getPokemonTypeColor(types);
+    const typeImages = getPokemonTypeImages(types);
+    const spriteUrl = sprites.other.dream_world.front_default || sprites.front_default;
 
     const openCard = document.getElementById('openedCard');
     openCard.innerHTML = `
         <div class="openedCard" style="background-color: ${backgroundColor};">
-        <div class="openedCardHeader">
-        <img src="${spriteUrl}" class="openedPokemonImage" alt="${pokemonName}">
-        <h1>${pokemonName}</h1>
-        </div>
-            <div class="openedCardBody" id="openedCardBody">
-                <div class="description">${formattedDescription}</div>
-                <div class="typeContainer">${typeImages}</div>
-                <div class="dot-navigation">
-                    <button class="dot" onclick="switchPage1(weight, height)"></button>
-                    <button class="dot" onclick="switchPage2(pokemonData.stats)"></button>
-                    <button class="dot" onclick="switchPage3()"></button>
-                </div>
-                <div id="statContainer" class="stats"><b>Weight:</b> ${weight} kg <br>  <b>Height:</b> ${height} cm
-                </div>
-            </div>
+            ${createOpenedCardHeader(pokemonName, spriteUrl)}
+            ${createOpenedCardBody(description, typeImages, weight, height, formattedStats)}
         </div>`;
     openCard.classList.remove('d-none');
 }
+
+function formatStats(statsArray) {
+    return statsArray.map(stat => {
+        return {
+            name: stat.stat.name,
+            value: stat.base_stat
+        };
+    });
+}
+
 
 function switchPage1(weight, height) {
     let container = document.getElementById('statContainer');
     container.innerHTML = `
     <div class="stats">
         <b>Weight:</b> ${weight} kg <br>  
-        <b>Height:</b> ${height} cm
+        <b>Height:</b> ${height} dm
     </div>`;
 }
 
-function switchPage2(stats) {
+function switchPage2(statsData) {
+    const stats = JSON.parse(statsData); // Parse den JSON-String zurück in ein JavaScript-Objekt/Array
     let container = document.getElementById('statContainer');
     container.innerHTML = '<div class="bar-chart">';
 
     stats.forEach(stat => {
-        let percentage = Math.min(100, Math.round((stat.base_stat / 255) * 100)); // Annahme: Maximalwert für Stats ist 255
+        let percentage = Math.round((stat.value / 150) * 100); // Annahme: 255 ist der maximale Wert
         container.innerHTML += `
-        <div class="bar" style="height: ${percentage}%; background-color: #76c7c0;">
-            ${stat.stat.name.toUpperCase()}: ${stat.base_stat} (${percentage}%)
-        </div>`;
+            <div class="bar" style="width: ${percentage}%; background-color: #76c7c0; margin: 5px 0;">
+                <span class="stat-name">${stat.name.toUpperCase()}:</span> ${stat.value} (${percentage}%)
+            </div>`;
     });
-
     container.innerHTML += '</div>';
 }
 
@@ -164,8 +199,7 @@ function switchPage3(weight, height) {
     let container = document.getElementById('statContainer');
     container.innerHTML = `
     <div class="stats">
-        <b>Weight:</b> ${weight} kg <br>  
-        <b>Height:</b> ${height} cm
+
     </div>`;
 }
 
@@ -176,8 +210,6 @@ document.addEventListener('click', function (event) {
         openCard.classList.add('d-none');
     }
 });
-
-
 
 /**
  * Gets the background color based on Pokémon type
