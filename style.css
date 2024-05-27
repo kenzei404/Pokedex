@@ -148,6 +148,7 @@ h1 {
 
 .openedCard {
     font-family: "Righteous", sans-serif;    
+    font-size: 24px;
     position: fixed;         /* Fixed Positionierung relativ zum Viewport */
     top: 50%;                /* Setzt den oberen Rand des Elements in die Mitte des Viewports */
     left: 50%;               /* Setzt den linken Rand des Elements in die Mitte des Viewports */
@@ -162,13 +163,13 @@ h1 {
     align-items: center;
     justify-content: space-between;
     background-color: #fff;  /* Hintergrundfarbe */
-    color: #000;             /* Textfarbe */
+    color: #000000;             /* Textfarbe */
     padding: 20px;           /* Innenabstand */
     box-sizing: border-box;  /* Box-Sizing, damit Padding und Border in die Breite und Höhe einbezogen werden */
 }
 
 .openedPokemonImage {
-    height: 200px;
+    height: 180px;
     margin-right: 8%;
     margin-left: 4%;
 }
@@ -176,6 +177,7 @@ h1 {
 .openedCardHeader{
     width: 100%;
     display: flex;
+    justify-content: space-between;
 }
 
 .openedCardBody{
@@ -198,27 +200,26 @@ h1 {
 
 .description {
     margin: 20px;
-    color: white;
+    color: rgb(0, 0, 0);
 }
 
-.dot-navigation {
-    margin: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-}
-
-.dot {
-    height: 20px;
-    width: 20px;
-    margin: 0 5px;
-    background-color: #bbb;
+.dot-navigation .dot {
+    background-color: #ccc;
     border: none;
+    width: 30px;
+    height: 30px !important;
     border-radius: 50%;
+    margin: 0 100px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 16px;
+    line-height: 30px;
+    text-align: center;
 }
+
+.dot-navigation .left-arrow, .dot-navigation .right-arrow {
+    font-weight: bold;
+}
+
 
 .dot:hover {
     background-color: #888;
@@ -233,22 +234,64 @@ h1 {
     flex-direction: column;
     align-items: flex-start;
     width: 100%; /* Adjust the width as necessary */
+    margin-top: 40px;
+    background-color: #262626;
+    border-radius: 8px;
+    border: solid 3px white;
 }
 
 .bar {
+    
     height: 40px; /* Height of each bar */
     background-color: #00f9e4; /* Color of the bars */
-    margin: 5px 0; /* Space between bars */
+    margin: 5px; /* Space between bars */
     color: white; /* Text color inside the bars */
     text-align: right; /* Positioning the text to the right inside the bar */
     padding-right: 5px; /* Padding for the text inside the bar */
     box-sizing: border-box; /* Includes padding in the width calculation */
     border-radius: 3px; /* Optional: rounded corners for the bars */
+    font-size: 16px;
+    border: #ffffff solid 3px;
 }
-
-
 
 .bar:hover {
     opacity: 0.8; /* Slight transparency on hover */
 }
 
+.stats{
+    font-size: 24px;
+    margin: 40px;
+
+}
+
+
+/* Grundlegende Stile für die opened card */
+.openedCard {
+    width: 50%;              /* Breite des Elements */
+    height: 70%;             /* Höhe des Elements */
+    padding: 20px;           /* Innenabstand */
+    /* Weitere Stile */
+}
+
+/* Media Query für Bildschirme kleiner als 1800px */
+@media (max-width: 1800px) {
+    .openedCard {
+        width: 70%;          /* Erhöhe die Breite, um mehr Platz zu nutzen */
+        height: auto;        /* Höhe auf auto setzen, um Überlauf zu vermeiden */
+        padding: 10px;       /* Reduziere den Innenabstand */
+    }
+
+    .openedCard .openedPokemonImage {
+        height: 150px;       /* Reduziere die Größe der Bilder */
+    }
+
+    .openedCard .description,
+    .openedCard .statsContainer,
+    .openedCard .typeContainer {
+        font-size: 14px;     /* Kleinere Schriftgröße für Textelemente */
+    }
+
+    .openedCard .bar {
+        height: 20px;        /* Reduziere die Balkenhöhe im Balkendiagramm */
+    }
+}

@@ -1,29 +1,31 @@
-/**
+/**Bobaclaaat
+ * 
+ * Hie isch standpunkt wa alles einigermassu ok gsi isch
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ *  
+ * 
+ * 
  * Initial function to load data and update navigation buttons
  */
 function initializePokedex() {
-    fetchAndDisplayAllPokemon();
+    fetchAllPokemons();
     updateNavigationButtons();
 }
 
 const BASE_URL = "https://pokeapi.co/api/v2/pokemon";
 let currentPage = 1;
 const pokemonPerPage = 30;
+const pokemonList = []; 
+let allPokemons = [];
 
-/**
- * Fetches all Pokémon data from the API and initializes the page
- */
-async function fetchAndDisplayAllPokemon() {
-    try {
-        const response = await fetch(`${BASE_URL}?limit=1302&offset=0`);
-        const responseData = await response.json();
-        const pokemonList = responseData.results;
-        updateNavigationButtons();
-        displayPokemonCards(pokemonList);
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
-}
+
 
 /**
  * Fetches detailed data for a single Pokémon
@@ -37,36 +39,62 @@ async function fetchDetailedPokemonData(url) {
 
         const speciesResponse = await fetch(data.species.url);
         const speciesData = await speciesResponse.json();
+        console.log(speciesData)
+
 
         const flavorTextEntry = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en');
         const description = flavorTextEntry ? flavorTextEntry.flavor_text : 'No description available.';
+        
 
         return {
             ...data,
             description,
+            speciesData,
         };
     } catch (error) {
         console.error("Error fetching Pokémon data:", error);
     }
 }
 
+
+
+
 /**
- * Displays Pokémon cards for the current page
- * @param {Array} pokemonList - List of Pokémon
+ * Fetches all Pokémon data from the API and initializes the page
  */
-async function displayPokemonCards(pokemonList) {
-    const container = document.getElementById('container');
-    container.innerHTML = '';
-
-    const startIndex = (currentPage - 1) * pokemonPerPage;
-    const endIndex = startIndex + pokemonPerPage;
-
-    for (let i = startIndex; i < endIndex && i < pokemonList.length; i++) {
-        const pokemonName = pokemonList[i].name.toUpperCase();
-        const pokemonData = await fetchDetailedPokemonData(pokemonList[i].url);
-        container.innerHTML += createPokemonCardHTML(pokemonName, pokemonData);
+async function fetchAllPokemons() {
+    try {
+        const response = await fetch(`${BASE_URL}?limit=1302`);
+        const data = await response.json();
+        allPokemons = data.results;  // Speichere alle Pokémon-Informationen global.
+        displayPokemonCards(currentPage);  // Zeige die erste Seite an.
+    } catch (error) {
+        console.error("Error fetching all Pokémon:", error);
     }
 }
+
+
+
+
+async function displayPokemonCards(page) {
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+    const startIndex = (page - 1) * pokemonPerPage;
+    const endIndex = Math.min(startIndex + pokemonPerPage, allPokemons.length);
+
+    const pokemonDetailsPromises = allPokemons.slice(startIndex, endIndex).map(pokemon => fetchDetailedPokemonData(pokemon.url));
+    const detailedPokemons = await Promise.all(pokemonDetailsPromises);
+
+    const pokemonCardsHtml = detailedPokemons.map((pokemonData, index) => {
+        const pokemonName = allPokemons[startIndex + index].name.toUpperCase();
+        return createPokemonCardHTML(pokemonName, pokemonData);
+    }).join('');
+
+    container.innerHTML = pokemonCardsHtml;
+}
+
+
+
 
 function createPokemonCardHTML(pokemonName, pokemonData) {
     const { types } = pokemonData;
@@ -92,6 +120,8 @@ function createPokemonCardHTML(pokemonName, pokemonData) {
 }
 
 
+
+
 function getPokemonTypeImages(types) {
     return types.map(typeInfo => {
         const imgSrc = `image/${typeInfo.type.name}.png`;
@@ -103,51 +133,17 @@ function getPokemonTypeImages(types) {
     }).join('');
 }
 
-function createDotNavigation(weight, height, stats) {
-    const statsJson = JSON.stringify(stats); // Konvertiere die Stats in einen JSON-String für die sichere Übergabe
-    return `
-        <div class="dot-navigation">
-            <button class="dot" onclick="switchPage1(${weight}, ${height})"></button>
-            <button class="dot" onclick="switchPage2(this.getAttribute('data-stats'))" data-stats='${statsJson}'></button>
-            <button class="dot" onclick="switchPage3()"></button>
-        </div>`;
-}
 
 
-function createStatsContainer(weight, height) {
-    return `
-        <div id="statContainer" class="stats">
-            <b>Weight:</b> ${weight} kg <br>  
-            <b>Height:</b> ${height} dm
-        </div>`;
-}
-
-function createOpenedCardBody(description, typeImages, weight, height, stats) {
-    const formattedDescription = cleanText(description).replace(/\n/g, '<br>');
-    return `
-        <div class="openedCardBody" id="openedCardBody">
-            <div class="description">${formattedDescription}</div>
-            <div class="typeContainer">${typeImages}</div>
-            ${createDotNavigation(weight, height, stats)}
-            ${createStatsContainer(weight, height)}
-        </div>`;
-}
-
-function createOpenedCardHeader(name, imageUrl) {
-    return `
-        <div class="openedCardHeader">
-            <img src="${imageUrl}" class="openedPokemonImage" alt="${name}">
-            <h1>${name}</h1>
-        </div>`;
-}
 
 async function openPokemonCardHTML(pokemonName) {
+
     const url = `${BASE_URL}/${pokemonName.toLowerCase()}`;
     const pokemonData = await fetchDetailedPokemonData(url);
-    const { sprites, types, weight, height, description, stats } = pokemonData;
-    const formattedStats = formatStats(stats); // Option 1, wenn du mit den Daten arbeiten möchtest
-    // const statsJson = statsToJson(stats); // Option 2, wenn du die Daten als JSON-String brauchst
 
+    const { sprites, types, weight, height, description, stats, abilities } = pokemonData;
+    const formattedStats = formatStats(stats); // Formatiere die Stats für das Balkendiagramm
+    const abilityNames = abilities.map(ab => ab.ability.name).join(', ');
     const backgroundColor = getPokemonTypeColor(types);
     const typeImages = getPokemonTypeImages(types);
     const spriteUrl = sprites.other.dream_world.front_default || sprites.front_default;
@@ -155,11 +151,115 @@ async function openPokemonCardHTML(pokemonName) {
     const openCard = document.getElementById('openedCard');
     openCard.innerHTML = `
         <div class="openedCard" style="background-color: ${backgroundColor};">
-            ${createOpenedCardHeader(pokemonName, spriteUrl)}
-            ${createOpenedCardBody(description, typeImages, weight, height, formattedStats)}
+            ${createOpenedCardHeader(pokemonName.toUpperCase(), spriteUrl)}
+            ${createOpenedCardBody(description, typeImages, weight, height, formattedStats, abilityNames)}
         </div>`;
     openCard.classList.remove('d-none');
+
+    // Aktualisiere die Anzeige direkt mit den Stats beim Öffnen der Karte
+    createStatsContainer(weight, height, abilityNames, formattedStats);
 }
+
+
+
+function createOpenedCardBody(description, typeImages, weight, height, stats, abilityNames) {
+    const formattedDescription = cleanText(description).replace(/\n/g, '<br>');
+    return `
+        <div class="openedCardBody" id="openedCardBody">
+            <div class="description">${formattedDescription}</div>
+            <div class="typeContainer">${typeImages}</div>
+
+            ${createStatsContainer(weight, height, abilityNames, stats)}
+        </div>`;
+}
+
+
+
+function createOpenedCardHeader(name, imageUrl) {
+    return `
+        <div class="openedCardHeader">
+            <button class="dot left-arrow" onclick="fetchPreviousPokemon()">&#8592;</button>
+            <img src="${imageUrl}" class="openedPokemonImage" alt="${name}">
+            <h1>${name}</h1>
+            <button class="dot right-arrow" onclick="fetchNextPokemon()">&#8594;</button>
+        </div>`;
+}
+
+
+
+function createDotNavigation() {
+    return `
+        <div class="dot-navigation">
+            <button class="dot left-arrow" onclick="fetchPreviousPokemon()">&#8592;</button>
+            <button class="dot right-arrow" onclick="fetchNextPokemon()">&#8594;</button>
+        </div>`;
+}
+
+
+
+async function fetchNextPokemon() {
+    if (currentPage < pokemonPerPage) {
+        currentPage++;
+        await displayPokemonCardByIndex(currentPage + 1);
+    }
+}
+
+
+
+async function fetchPreviousPokemon() {
+    if (currentPage > 1) {
+        currentPage--;
+        await displayPokemonCardByIndex(currentPage - 1);
+    }
+}
+
+
+
+
+async function displayPokemonCardByIndex(index) {
+    const response = await fetch(`${BASE_URL}?limit=1302&offset=0`);
+    const responseData = await response.json();
+    if (responseData.results[index]) {
+        const pokemonName = responseData.results[index].name;
+        openPokemonCardHTML(pokemonName);
+    }
+}
+
+
+
+
+function showDetails() {
+    const container = document.getElementById('statContainer');
+    // Hier musst du sicherstellen, dass die benötigten Daten verfügbar sind, z.B. durch Speichern im Zustand oder Durchreichen als Parameter.
+    container.innerHTML = createStatsContainer(weight, height, abilityNames);
+}
+
+
+
+
+function createStatsContainer(weight, height, abilityNames, stats) {
+    let statsContent = '';
+    if (stats) {
+        stats.forEach(stat => {
+            const percentage = Math.round((stat.value / 150) * 100); // Annahme: 255 ist der maximale Wert
+            statsContent += `
+                <div class="bar" style="width: ${percentage}%; background-color: #76c7c0; margin: 5px 0;">
+                    <span class="stat-name">${stat.name.toUpperCase()}:</span> ${stat.value} (${percentage}%)
+                </div>`;
+        });
+    }
+
+    return `
+        <div id="statContainer" class="stats">
+            <b>Weight:</b> ${weight} kg <br>  
+            <b>Height:</b> ${height} dm <br>
+            <b>Abilities:</b> ${abilityNames} <br>
+            <div class="bar-chart">${statsContent}</div>
+        </div>`;
+}
+
+
+
 
 function formatStats(statsArray) {
     return statsArray.map(stat => {
@@ -171,45 +271,18 @@ function formatStats(statsArray) {
 }
 
 
-function switchPage1(weight, height) {
-    let container = document.getElementById('statContainer');
-    container.innerHTML = `
-    <div class="stats">
-        <b>Weight:</b> ${weight} kg <br>  
-        <b>Height:</b> ${height} dm
-    </div>`;
-}
 
-function switchPage2(statsData) {
-    const stats = JSON.parse(statsData); // Parse den JSON-String zurück in ein JavaScript-Objekt/Array
-    let container = document.getElementById('statContainer');
-    container.innerHTML = '<div class="bar-chart">';
-
-    stats.forEach(stat => {
-        let percentage = Math.round((stat.value / 150) * 100); // Annahme: 255 ist der maximale Wert
-        container.innerHTML += `
-            <div class="bar" style="width: ${percentage}%; background-color: #76c7c0; margin: 5px 0;">
-                <span class="stat-name">${stat.name.toUpperCase()}:</span> ${stat.value} (${percentage}%)
-            </div>`;
-    });
-    container.innerHTML += '</div>';
-}
-
-function switchPage3(weight, height) {
-    let container = document.getElementById('statContainer');
-    container.innerHTML = `
-    <div class="stats">
-
-    </div>`;
-}
-
-
+// Diese Funktion schliesst die geöffnete Pokemonkarte beim klick auf den Hintergrund.
 document.addEventListener('click', function (event) {
     const openCard = document.getElementById('openedCard');
     if (!openCard.contains(event.target) && !event.target.closest('.pokemon-card')) {
         openCard.classList.add('d-none');
+        
     }
 });
+
+
+
 
 /**
  * Gets the background color based on Pokémon type
@@ -220,6 +293,9 @@ function getPokemonTypeColor(types) {
     const mainType = types[0].type.name;
     return typeColors[mainType] || '#FFFFFF';
 }
+
+
+
 
 const typeColors = {
     normal: '#A8A77A',
@@ -242,46 +318,35 @@ const typeColors = {
     fairy: '#D685AD'
 };
 
-/**
- * Fetches the next page of Pokémon data
- */
+
+
+
+
+
 async function fetchNextPage() {
-    currentPage++;
-    const offset = (currentPage - 1) * pokemonPerPage;
-
-    try {
-        const response = await fetch(`${BASE_URL}?limit=${pokemonPerPage}&offset=${offset}`);
-        const responseData = await response.json();
-        const pokemonList = responseData.results;
-
-        displayPokemonCards(pokemonList);
+    if ((currentPage - 1) * pokemonPerPage < allPokemons.length - 1) {
+        currentPage++;
+        displayPokemonCards(currentPage);
         updateNavigationButtons();
         window.scrollTo(0, 0);
-    } catch (error) {
-        console.error("Error fetching next page:", error);
+    } else {
+        console.log("No more Pokémon to display.");
     }
-}
+} 
+
 
 /**
  * Fetches the previous page of Pokémon data
  */
+
 async function fetchPreviousPage() {
     if (currentPage > 1) {
         currentPage--;
-        const offset = (currentPage - 1) * pokemonPerPage;
-
-        try {
-            const response = await fetch(`${BASE_URL}?limit=${pokemonPerPage}&offset=${offset}`);
-            const responseData = await response.json();
-            const pokemonList = responseData.results;
-
-            displayPokemonCards(pokemonList);
-            updateNavigationButtons();
-            window.scrollTo(0, 0);
-        } catch (error) {
-            console.error("Error fetching previous page:", error);
-        }
-    }
+        displayPokemonCards(currentPage);
+        updateNavigationButtons();
+    } else {
+    console.log("No previous Pokémon to display.");
+}
 }
 
 /**
@@ -292,12 +357,30 @@ function updateNavigationButtons() {
     const nextPageButton = document.querySelector('.nextPageButton');
     document.getElementById('actualPage').innerText = currentPage;
 
-    if (currentPage === 1) {
-        previousPageButton.style.visibility = 'hidden';
-    } else {
-        previousPageButton.style.visibility = 'visible';
-    }
+    // Check if there is a next or previous page by attempting to fetch without loading
+    checkPageAvailability();
 }
+
+
+
+
+async function checkPageAvailability() {
+    // Check next page
+    const offsetNext = currentPage * pokemonPerPage;
+    try {
+        let response = await fetch(`${BASE_URL}?limit=${pokemonPerPage}&offset=${offsetNext}`);
+        let data = await response.json();
+        document.querySelector('.nextPageButton').style.visibility = data.results.length > 0 ? 'visible' : 'hidden';
+    } catch (error) {
+        console.error("Error checking next page availability:", error);
+    }
+
+    // Check previous page
+    document.querySelector('.previousPageButton').style.visibility = currentPage > 1 ? 'visible' : 'hidden';
+}
+
+
+
 
 /**
  * Cleans text by removing non-printable characters
@@ -306,4 +389,13 @@ function updateNavigationButtons() {
  */
 function cleanText(text) {
     return text.replace(/[^\x20-\x7E]/g, '');
+}
+
+
+
+
+function searchPokemon(){
+    let serachInput = document.getElementById('inputField').value;
+    fetch 
+
 }
