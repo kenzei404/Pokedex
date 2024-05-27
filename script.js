@@ -137,7 +137,7 @@ function getPokemonTypeImages(types) {
 
 
 async function openPokemonCardHTML(pokemonName) {
-
+    currentPokemonName = pokemonName;
     const url = `${BASE_URL}/${pokemonName.toLowerCase()}`;
     const pokemonData = await fetchDetailedPokemonData(url);
 
@@ -198,21 +198,21 @@ function createDotNavigation() {
 
 
 async function fetchNextPokemon() {
-    if (currentPage < pokemonPerPage) {
-        currentPage++;
-        await displayPokemonCardByIndex(currentPage + 1);
+    const currentIndex = allPokemons.findIndex(p => p.name.toLowerCase() === currentPokemonName.toLowerCase());
+    if (currentIndex < allPokemons.length - 1) {
+        const nextPokemonName = allPokemons[currentIndex + 1].name;
+        openPokemonCardHTML(nextPokemonName);
     }
 }
-
 
 
 async function fetchPreviousPokemon() {
-    if (currentPage > 1) {
-        currentPage--;
-        await displayPokemonCardByIndex(currentPage - 1);
+    const currentIndex = allPokemons.findIndex(p => p.name.toLowerCase() === currentPokemonName.toLowerCase());
+    if (currentIndex > 0) {
+        const previousPokemonName = allPokemons[currentIndex - 1].name;
+        openPokemonCardHTML(previousPokemonName);
     }
 }
-
 
 
 
