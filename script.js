@@ -1,19 +1,3 @@
-/**Bobaclaaat
- * 
- * Hie isch standpunkt wa alles einigermassu ok gsi isch
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- *  
- * 
- * 
- * Initial function to load data and update navigation buttons
- */
 function initializePokedex() {
     fetchAllPokemons();
     updateNavigationButtons();
@@ -39,7 +23,6 @@ async function fetchDetailedPokemonData(url) {
 
         const speciesResponse = await fetch(data.species.url);
         const speciesData = await speciesResponse.json();
-        console.log(speciesData)
 
 
         const flavorTextEntry = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en');
@@ -55,7 +38,6 @@ async function fetchDetailedPokemonData(url) {
         console.error("Error fetching Pokémon data:", error);
     }
 }
-
 
 
 
@@ -100,7 +82,8 @@ function createPokemonCardHTML(pokemonName, pokemonData) {
     const { types } = pokemonData;
     const backgroundColor = getPokemonTypeColor(types);
 
-    const spriteUrl = pokemonData.sprites.other.dream_world.front_default || pokemonData.sprites.front_default;
+    const spriteUrl = pokemonData.sprites.other['official-artwork'].front_default || pokemonData.sprites.other.dream_world.front_default;
+
 
     const typeImages = types.map(typeInfo => {
         const typeName = typeInfo.type.name;
@@ -110,7 +93,7 @@ function createPokemonCardHTML(pokemonName, pokemonData) {
 
     // Hier verwenden wir nur den Namen, um die Karte zu öffnen
     return `
-        <div onclick="openPokemonCardHTML('${pokemonName}')" class="pokemon-card" style="background-color: ${backgroundColor};">
+        <div onclick="openPokemonCardHTML('${pokemonName}')" class="pokemon-card hover" style="background-color: ${backgroundColor};">
             <img src="${spriteUrl}" class="pokemonImage" alt="${pokemonName}">
             <div class="card-body">
                 <div class="name">${pokemonName}</div>
@@ -128,25 +111,24 @@ function getPokemonTypeImages(types) {
         return `
             <div class="openedTypeContainer">
                 <img src="${imgSrc}" class="type-icon">
-                <div class="typeName">${typeInfo.type.name}</div>
+          
             </div>`;
     }).join('');
 }
 
 
 
-
 async function openPokemonCardHTML(pokemonName) {
+   
     currentPokemonName = pokemonName;
     const url = `${BASE_URL}/${pokemonName.toLowerCase()}`;
     const pokemonData = await fetchDetailedPokemonData(url);
-
-    const { sprites, types, weight, height, description, stats, abilities } = pokemonData;
+    const { types, weight, height, description, stats, abilities } = pokemonData;
     const formattedStats = formatStats(stats); // Formatiere die Stats für das Balkendiagramm
     const abilityNames = abilities.map(ab => ab.ability.name).join(', ');
     const backgroundColor = getPokemonTypeColor(types);
     const typeImages = getPokemonTypeImages(types);
-    const spriteUrl = sprites.other.dream_world.front_default || sprites.front_default;
+    const spriteUrl = pokemonData.sprites.other['official-artwork'].front_default || pokemonData.sprites.other.dream_world.front_default;
 
     const openCard = document.getElementById('openedCard');
     openCard.innerHTML = `
@@ -155,9 +137,17 @@ async function openPokemonCardHTML(pokemonName) {
             ${createOpenedCardBody(description, typeImages, weight, height, formattedStats, abilityNames)}
         </div>`;
     openCard.classList.remove('d-none');
+    document.querySelectorAll('.pokemon-card').forEach(card => {
+        card.classList.remove('hover');
+    });
 
     // Aktualisiere die Anzeige direkt mit den Stats beim Öffnen der Karte
     createStatsContainer(weight, height, abilityNames, formattedStats);
+
+}
+
+function getPokemonSprite(sprites) {
+    return sprites.other['official-artwork'].front_default || sprites.other.dream_world.front_default;
 }
 
 
@@ -178,22 +168,13 @@ function createOpenedCardBody(description, typeImages, weight, height, stats, ab
 function createOpenedCardHeader(name, imageUrl) {
     return `
         <div class="openedCardHeader">
-            <button class="dot left-arrow" onclick="fetchPreviousPokemon()">&#8592;</button>
+            <button class="previousPokemonButton" onclick="fetchPreviousPokemon()"></button>
             <img src="${imageUrl}" class="openedPokemonImage" alt="${name}">
             <h1>${name}</h1>
-            <button class="dot right-arrow" onclick="fetchNextPokemon()">&#8594;</button>
+            <button class="nextPokemonButton" onclick="fetchNextPokemon()"></button>
         </div>`;
 }
 
-
-
-function createDotNavigation() {
-    return `
-        <div class="dot-navigation">
-            <button class="dot left-arrow" onclick="fetchPreviousPokemon()">&#8592;</button>
-            <button class="dot right-arrow" onclick="fetchNextPokemon()">&#8594;</button>
-        </div>`;
-}
 
 
 
@@ -204,6 +185,7 @@ async function fetchNextPokemon() {
         openPokemonCardHTML(nextPokemonName);
     }
 }
+
 
 
 async function fetchPreviousPokemon() {
@@ -227,13 +209,11 @@ async function displayPokemonCardByIndex(index) {
 
 
 
-
 function showDetails() {
     const container = document.getElementById('statContainer');
     // Hier musst du sicherstellen, dass die benötigten Daten verfügbar sind, z.B. durch Speichern im Zustand oder Durchreichen als Parameter.
     container.innerHTML = createStatsContainer(weight, height, abilityNames);
 }
-
 
 
 
@@ -244,7 +224,7 @@ function createStatsContainer(weight, height, abilityNames, stats) {
             const percentage = Math.round((stat.value / 150) * 100); // Annahme: 255 ist der maximale Wert
             statsContent += `
                 <div class="bar" style="width: ${percentage}%; background-color: #76c7c0; margin: 5px 0;">
-                    <span class="stat-name">${stat.name.toUpperCase()}:</span> ${stat.value} (${percentage}%)
+                    <span class="stat-name">${stat.name.toUpperCase()}:</span> ${stat.value}
                 </div>`;
         });
     }
@@ -253,7 +233,7 @@ function createStatsContainer(weight, height, abilityNames, stats) {
         <div id="statContainer" class="stats">
             <b>Weight:</b> ${weight} kg <br>  
             <b>Height:</b> ${height} dm <br>
-            <b>Abilities:</b> ${abilityNames} <br>
+            <b>Abilities:</b> ${abilityNames.toUpperCase()} <br>
             <div class="bar-chart">${statsContent}</div>
         </div>`;
 }
@@ -277,10 +257,13 @@ document.addEventListener('click', function (event) {
     const openCard = document.getElementById('openedCard');
     if (!openCard.contains(event.target) && !event.target.closest('.pokemon-card')) {
         openCard.classList.add('d-none');
-        
+
+        // Füge die 'hover'-Klasse allen Pokémon-Karten hinzu, wenn die geöffnete Karte geschlossen wird
+        document.querySelectorAll('.pokemon-card').forEach(card => {
+            card.classList.add('hover');
+        });
     }
 });
-
 
 
 
@@ -293,10 +276,6 @@ function getPokemonTypeColor(types) {
     const mainType = types[0].type.name;
     return typeColors[mainType] || '#FFFFFF';
 }
-
-
-
-
 const typeColors = {
     normal: '#A8A77A',
     fire: '#EE8130',
@@ -320,6 +299,12 @@ const typeColors = {
 
 
 
+function goToFirstPage() {
+    currentPage = 1; // Setzt die aktuelle Seite auf die erste Seite
+    displayPokemonCards(currentPage); // Ruft die Funktion auf, um die Karten der ersten Seite anzuzeigen
+    updateNavigationButtons(); // Aktualisiert die Navigationsknöpfe entsprechend 
+    document.getElementById('backToFirstPageButton').classList.add('d-none')
+}
 
 
 
@@ -333,7 +318,6 @@ async function fetchNextPage() {
         console.log("No more Pokémon to display.");
     }
 } 
-
 
 /**
  * Fetches the previous page of Pokémon data
@@ -349,15 +333,19 @@ async function fetchPreviousPage() {
 }
 }
 
+
+
 /**
  * Updates the visibility of page navigation buttons
  */
 function updateNavigationButtons() {
-    const previousPageButton = document.querySelector('.previousPageButton');
-    const nextPageButton = document.querySelector('.nextPageButton');
+   if(currentPage > 2){
+    document.getElementById('backToFirstPageButton').classList.remove('d-none');
+    document.getElementById('siteChanger').style.marginRight = '6.5%'; 
+   } else{
+    document.getElementById('siteChanger').style.marginRight = '0'; 
+   }
     document.getElementById('actualPage').innerText = currentPage;
-
-    // Check if there is a next or previous page by attempting to fetch without loading
     checkPageAvailability();
 }
 
@@ -391,11 +379,49 @@ function cleanText(text) {
     return text.replace(/[^\x20-\x7E]/g, '');
 }
 
+function searchPokemon() {
+    let inputValue = document.getElementById('inputField').value.trim().toLowerCase();
+    document.getElementById('siteChanger').classList.add('d-none');
+    document.getElementById('backAfterSearch').classList.remove('d-none');
+    
+    if (inputValue.length === 0) {
+        displayPokemonCards(1); // Zeigt die erste Seite der Gesamtliste an, wenn das Suchfeld leer ist
+        return;
+    }
+
+    const filteredPokemons = allPokemons.filter(pokemon =>
+        pokemon.name.toLowerCase().startsWith(inputValue)
+    );
+
+    if (filteredPokemons.length > 0) {
+        displayFilteredPokemonCards(filteredPokemons);
+    } else {
+        alert("Kein Pokémon gefunden, das mit diesen Buchstaben beginnt. Bitte überprüfen Sie die Eingabe.");
+    }
+}
 
 
+async function displayFilteredPokemonCards(filteredPokemons) {
+    const container = document.getElementById('container');
+    container.innerHTML = ''; 
 
-function searchPokemon(){
-    let serachInput = document.getElementById('inputField').value;
-    fetch 
+    const pokemonDetailsPromises = filteredPokemons.map(pokemon =>
+        fetchDetailedPokemonData(pokemon.url));
+    const detailedPokemons = await Promise.all(pokemonDetailsPromises);
+
+    const pokemonCardsHtml = detailedPokemons.map((pokemonData, index) => {
+        const pokemonName = filteredPokemons[index].name.toUpperCase();
+        return createPokemonCardHTML(pokemonName, pokemonData);
+    }).join('');
+
+    container.innerHTML = pokemonCardsHtml; // Setzt den HTML-Inhalt auf die gefilterten Karten
+}
+
+
+function backAfterSearch(){
+    initializePokedex();
+    document.getElementById('siteChanger').classList.remove('d-none');
+    document.getElementById('backAfterSearch').classList.add('d-none');
+    document.getElementById('inputField').value = '';
 
 }
