@@ -10,7 +10,6 @@ const pokemonList = [];
 let allPokemons = [];
 
 
-
 /**
  * Fetches detailed data for a single Pokémon
  * @param {string} url - URL to fetch Pokémon data
@@ -40,7 +39,6 @@ async function fetchDetailedPokemonData(url) {
 }
 
 
-
 /**
  * Fetches all Pokémon data from the API and initializes the page
  */
@@ -54,8 +52,6 @@ async function fetchAllPokemons() {
         console.error("Error fetching all Pokémon:", error);
     }
 }
-
-
 
 
 async function displayPokemonCards(page) {
@@ -74,8 +70,6 @@ async function displayPokemonCards(page) {
 
     container.innerHTML = pokemonCardsHtml;
 }
-
-
 
 
 function createPokemonCardHTML(pokemonName, pokemonData) {
@@ -103,8 +97,6 @@ function createPokemonCardHTML(pokemonName, pokemonData) {
 }
 
 
-
-
 function getPokemonTypeImages(types) {
     return types.map(typeInfo => {
         const imgSrc = `image/${typeInfo.type.name}.png`;
@@ -115,7 +107,6 @@ function getPokemonTypeImages(types) {
             </div>`;
     }).join('');
 }
-
 
 
 async function openPokemonCardHTML(pokemonName) {
@@ -129,7 +120,6 @@ async function openPokemonCardHTML(pokemonName) {
     const backgroundColor = getPokemonTypeColor(types);
     const typeImages = getPokemonTypeImages(types);
     const spriteUrl = pokemonData.sprites.other['official-artwork'].front_default || pokemonData.sprites.other.dream_world.front_default;
-
     const openCard = document.getElementById('openedCard');
     openCard.innerHTML = `
         <div class="openedCard" style="background-color: ${backgroundColor};">
@@ -146,10 +136,10 @@ async function openPokemonCardHTML(pokemonName) {
 
 }
 
+
 function getPokemonSprite(sprites) {
     return sprites.other['official-artwork'].front_default || sprites.other.dream_world.front_default;
 }
-
 
 
 function createOpenedCardBody(description, typeImages, weight, height, stats, abilityNames) {
@@ -164,25 +154,31 @@ function createOpenedCardBody(description, typeImages, weight, height, stats, ab
 }
 
 
-
 function createOpenedCardHeader(name, imageUrl) {
     return `
         <div class="openedCardHeader">
             <button class="previousPokemonButton" onclick="fetchPreviousPokemon()"></button>
+            <div class="openedNameAndImage">
             <img src="${imageUrl}" class="openedPokemonImage" alt="${name}">
             <h1>${name}</h1>
+            </div>
             <button class="nextPokemonButton" onclick="fetchNextPokemon()"></button>
         </div>`;
 }
 
 
-
-
 async function fetchNextPokemon() {
     const currentIndex = allPokemons.findIndex(p => p.name.toLowerCase() === currentPokemonName.toLowerCase());
     if (currentIndex < allPokemons.length - 1) {
+        // Normalerweise zum nächsten Pokémon wechseln
         const nextPokemonName = allPokemons[currentIndex + 1].name;
         openPokemonCardHTML(nextPokemonName);
+        currentPokemonName = nextPokemonName;  // Aktualisiere den Namen des aktuellen Pokémon
+    } else {
+        // Wenn das Ende der Liste erreicht ist, zum ersten Pokémon springen
+        const firstPokemonName = allPokemons[0].name;
+        openPokemonCardHTML(firstPokemonName);
+        currentPokemonName = firstPokemonName;  // Aktualisiere den Namen des aktuellen Pokémon
     }
 }
 
@@ -193,9 +189,13 @@ async function fetchPreviousPokemon() {
     if (currentIndex > 0) {
         const previousPokemonName = allPokemons[currentIndex - 1].name;
         openPokemonCardHTML(previousPokemonName);
+    }else {
+        // Wenn currentIndex == 0, gehe zum letzten Pokémon in der Liste
+        const lastPokemonName = allPokemons[allPokemons.length - 1].name;
+        openPokemonCardHTML(lastPokemonName);
+        currentPokemonName = lastPokemonName;  // Aktualisiere den Namen des aktuellen Pokémon
     }
 }
-
 
 
 async function displayPokemonCardByIndex(index) {
@@ -208,13 +208,11 @@ async function displayPokemonCardByIndex(index) {
 }
 
 
-
 function showDetails() {
     const container = document.getElementById('statContainer');
     // Hier musst du sicherstellen, dass die benötigten Daten verfügbar sind, z.B. durch Speichern im Zustand oder Durchreichen als Parameter.
     container.innerHTML = createStatsContainer(weight, height, abilityNames);
 }
-
 
 
 function createStatsContainer(weight, height, abilityNames, stats) {
@@ -239,8 +237,6 @@ function createStatsContainer(weight, height, abilityNames, stats) {
 }
 
 
-
-
 function formatStats(statsArray) {
     return statsArray.map(stat => {
         return {
@@ -251,10 +247,10 @@ function formatStats(statsArray) {
 }
 
 
-
 // Diese Funktion schliesst die geöffnete Pokemonkarte beim klick auf den Hintergrund.
 document.addEventListener('click', function (event) {
     const openCard = document.getElementById('openedCard');
+
     if (!openCard.contains(event.target) && !event.target.closest('.pokemon-card')) {
         openCard.classList.add('d-none');
 
@@ -264,7 +260,6 @@ document.addEventListener('click', function (event) {
         });
     }
 });
-
 
 
 /**
@@ -298,14 +293,12 @@ const typeColors = {
 };
 
 
-
 function goToFirstPage() {
     currentPage = 1; // Setzt die aktuelle Seite auf die erste Seite
     displayPokemonCards(currentPage); // Ruft die Funktion auf, um die Karten der ersten Seite anzuzeigen
     updateNavigationButtons(); // Aktualisiert die Navigationsknöpfe entsprechend 
     document.getElementById('backToFirstPageButton').classList.add('d-none')
 }
-
 
 
 async function fetchNextPage() {
@@ -334,7 +327,6 @@ async function fetchPreviousPage() {
 }
 
 
-
 /**
  * Updates the visibility of page navigation buttons
  */
@@ -348,8 +340,6 @@ function updateNavigationButtons() {
     document.getElementById('actualPage').innerText = currentPage;
     checkPageAvailability();
 }
-
-
 
 
 async function checkPageAvailability() {
@@ -368,8 +358,6 @@ async function checkPageAvailability() {
 }
 
 
-
-
 /**
  * Cleans text by removing non-printable characters
  * @param {string} text - The text to clean
@@ -378,6 +366,7 @@ async function checkPageAvailability() {
 function cleanText(text) {
     return text.replace(/[^\x20-\x7E]/g, '');
 }
+
 
 function searchPokemon() {
     let inputValue = document.getElementById('inputField').value.trim().toLowerCase();

@@ -36,6 +36,9 @@ h1 {
 
 .pokemonSearch {
     margin-top: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .header {
@@ -252,8 +255,8 @@ h1 {
     width: 100%;
     display: flex;
     align-items: center;
-    margin-left: 16px;
     justify-content: center;
+    margin-top: 24px;
 }
 
 .description {
@@ -346,6 +349,12 @@ b {
     /* Weitere Stile */
 }
 
+
+.openedNameAndImage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 /* Media Query für Bildschirme kleiner als 1800px */
 @media (max-width: 1800px) {
     .openedCard {
@@ -383,4 +392,218 @@ b {
     }
 
     h1 {font-size: 40px;}
+
+    .pokemon-card{
+        margin: 15px;
+    }
 }
+
+
+
+
+/* Media Query für Bildschirme zwischen 900px und 400px */
+@media (max-width: 1000px) and (min-width: 800px) {
+
+    .header{
+        height: 300px;
+    }
+    .openedCard {
+        width: 60%;          /* Angepasste Breite für mittlere Bildschirme */
+        height: auto;        /* Flexible Höhe zur Vermeidung von Überlauf */
+        padding: 10px;       /* Angepasster Innenabstand */
+    }
+
+    .openedCard .openedPokemonImage {
+        height: 120px;       /* Angepasste Größe der Bilder */
+    }
+
+    .openedCard .description,
+    .openedCard .statsContainer,
+    .openedCard .typeContainer {
+        font-size: 18px;     /* Angepasste Schriftgröße für mittlere Bildschirme */
+    }
+
+    .openedCard .bar {
+        height: 25px;        /* Angepasste Höhe der Balken im Balkendiagramm */
+    }
+
+    .stats {
+        font-size: 14px;     /* Kleinere Schriftgröße für Statistiktexte */
+        margin: 20px;        /* Angepasster Rand um Statistikbereiche */
+    }
+
+    .bar {
+        font-size: 10px;     /* Kleinere Schriftgröße für Balkenbeschriftungen */
+    }
+
+    .type-icon {
+        height: 80px;        /* Angepasste Größe der Typ-Icons */
+    }
+
+    h1 {
+        font-size: 32px;     /* Kleinere Schriftgröße für Hauptüberschriften */
+    }
+
+    .inputField {
+        width: 180px;       
+        font-size: 20px;     
+        height: 30px;       
+    }
+
+    .searchButton{
+        height: 40px;
+    }
+
+
+    .pokemon-card {
+        width: 250px;       
+        height: 350px; 
+        margin:10px;      
+    }
+
+    .pokemonSearch{
+        margin-top: 250px;
+    }
+
+    .pokemonImage {
+        height: 150px;       /* Angepasste Bildhöhe */
+        width: 150px;        /* Angepasste Bildbreite */
+    }
+
+    .name, .type-icon {
+        font-size: 20px;     /* Angepasste Schriftgröße für Namen und Typ-Icons */
+    }
+
+    .typeContainer {
+        height: 60px;        /* Angepasste Höhe des Typ-Containers */
+    }
+
+    .siteChanger {
+        margin-top: 30px;    /* Angepasster Abstand oberhalb des SiteChangers */
+    }
+
+    .previousPageButton, .nextPageButton {
+        width: 80px;         /* Angepasste Breite der Navigationsbuttons */
+        height: 80px;        /* Angepasste Höhe der Navigationsbuttons */
+    }
+
+    .actualPage {
+        font-size: 28px;     /* Angepasste Schriftgröße für die aktuelle Seitenzahl */
+    }
+
+    .container{
+        margin-top: 40px !important;
+    }
+}
+
+
+
+
+
+/* Media Query für Bildschirme kleiner als 400px */
+@media (max-width: 800px) {
+    .header {
+        height: 200px; /* Reduzierte Höhe für den Header */
+    }
+
+    .description{
+        display: none;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+     .pokemonSearch
+    
+    .inputField {
+        height: 20px;
+    }
+
+
+    .searchButton {
+        width: 150px; /* Reduziere die Breite von Eingabefeld und Button */
+        font-size: 18px; /* Kleinere Schriftgröße */
+        height: 30px !important; /* Reduziere die Höhe */
+    }
+
+    .container{
+        margin-top: 30px !important;
+    }
+
+    .pokemon-card {
+        width: 150px; /* Reduziere die Breite der Pokémon-Karten */
+        height: 250px;
+        margin: 5px;
+    }
+
+    .pokemonImage {
+        height: 100px; /* Kleinere Bildhöhe */
+        width: 100px; /* Kleinere Bildbreite */
+    }
+
+    .name, .type-icon {
+        font-size: 16px; /* Kleinere Schriftgröße für Namen und Typ-Icons */
+    }
+
+    .typeContainer {
+        height: 40px; /* Reduziere die Höhe des Typ-Containers */
+    }
+
+    .siteChanger {
+        margin-top: 20px; /* Reduzierter Abstand oberhalb des SiteChangers */
+    }
+
+    .previousPageButton, .nextPageButton {
+        width: 50px; /* Reduziere die Breite der Navigationsbuttons */
+        height: 50px !important; /* Reduziere die Höhe der Navigationsbuttons */
+    }
+
+    .actualPage {
+        font-size: 20px; /* Kleinere Schriftgröße für die aktuelle Seitenzahl */
+    }
+
+    .openedCard{
+        height: 480px;
+    }
+    .openedPokemonImage{
+        height: 80px !important;
+    }
+
+    .openedTypeContainer{
+        margin:0;
+    }
+
+    .stats {
+        font-size: 10px;
+        margin: 0;
+        margin-top: 15px;
+    }
+
+    .type-icon{
+        height: 60px; 
+    }
+
+    .bar{
+        font-size: 6px;
+        height: 24px !important;
+    }
+
+    .pokemonSearch{
+        margin-top: 175px;
+    }
+
+    .openedCardHeader{
+        height: 150px !important;
+      
+        justify-content: center;
+        display: flex;
+        align-items: center;
+    }
+
+  .openedNameAndImage{
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
